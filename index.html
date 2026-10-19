@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f3">
+  <title>LoopLearn | AI Learning Studio</title>
+  <script>window.location.replace('/bureau.html');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172c28;
+      --muted: #72817c;
+      --line: #e5e9e4;
+      --paper: #ffffff;
+      --canvas: #f5f6f3;
+      --green: #19745a;
+      --green-dark: #125440;
+      --mint: #e4f3eb;
+      --lime: #d8f064;
+      --coral: #e47b5e;
+      --blue: #dcebf4;
+      --yellow: #f8ebbc;
+      --shadow: 0 10px 30px rgba(29, 52, 43, .06);
+      font-family: "DM Sans", "Noto Sans TC", sans-serif;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--canvas); }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 246px minmax(0, 1fr); }
+    .sidebar { background: #fff; border-right: 1px solid var(--line); padding: 26px 17px 20px; display: flex; flex-direction: column; min-height: 100vh; }
+    .brand { padding: 0 11px 32px; display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 0; font-size: 19px; }
+    .brand-mark { width: 31px; height: 31px; border-radius: 10px; background: var(--green); color: white; display: grid; place-items: center; font-size: 19px; font-weight: 600; }
+    .workspace-label { color: #a1aaa6; font-size: 10px; text-transform: uppercase; letter-spacing: 1.1px; padding: 0 11px 10px; font-weight: 700; }
+    .nav { display: grid; gap: 4px; }
+    .nav button { border: 0; cursor: pointer; background: transparent; text-align: left; border-radius: 8px; padding: 10px 11px; color: #65736d; display: flex; align-items: center; gap: 12px; font-size: 13px; transition: background .18s, color .18s; }
+    .nav button:hover { background: #f5f7f4; color: var(--ink); }
+    .nav button.active { background: var(--mint); color: var(--green-dark); font-weight: 700; }
+    .nav-icon { width: 18px; text-align: center; font-size: 16px; }
+    .side-bottom { margin-top: auto; }
+    .coach-card { background: #f1f7f1; border: 1px solid #e7eee7; padding: 15px; border-radius: 9px; margin: 0 3px 18px; }
+    .coach-avatar { background: var(--lime); width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; font-size: 14px; margin-bottom: 11px; }
+    .coach-card strong { font-size: 12px; }
+    .coach-card p { color: #718078; font-size: 11px; line-height: 1.55; margin: 5px 0 11px; }
+    .text-link { color: var(--green); background: none; padding: 0; border: 0; font-weight: 700; font-size: 11px; cursor: pointer; }
+    .profile { display: flex; align-items: center; gap: 10px; padding: 14px 8px 0; border-top: 1px solid var(--line); }
+    .avatar { height: 34px; width: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 50%; background: #f3d8c9; color: #734833; font-weight: 700; font-size: 12px; }
+    .profile-name { font-size: 11px; font-weight: 700; }
+    .profile-role { color: var(--muted); font-size: 10px; margin-top: 2px; }
+    main { min-width: 0; }
+    .topbar { height: 67px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 4.1%; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.76); }
+    .breadcrumbs { color: #89938f; font-size: 11px; }
+    .breadcrumbs b { color: var(--ink); font-weight: 600; }
+    .top-actions { display: flex; align-items: center; gap: 13px; }
+    .role-switch { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--line); background: #fff; border-radius: 7px; }
+    .role-switch button { border: 0; background: none; color: var(--muted); padding: 6px 10px; border-radius: 5px; font-size: 10px; cursor: pointer; }
+    .role-switch button.active { background: var(--green); color: #fff; }
+    .icon-button { width: 33px; height: 33px; border: 1px solid var(--line); border-radius: 7px; background: white; cursor: pointer; font-size: 15px; position: relative; }
+    .notification-dot { width: 6px; height: 6px; border: 1px solid white; border-radius: 50%; background: var(--coral); position: absolute; top: 6px; right: 6px; }
+    .content { max-width: 1260px; padding: 32px 4.1% 52px; margin: 0 auto; }
+    .view { display: none; animation: appear .25s ease both; }
+    .view.active { display: block; }
+    @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .eyebrow { text-transform: uppercase; color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(25px, 3vw, 34px); line-height: 1.2; letter-spacing: 0; margin: 8px 0 7px; }
+    .subheading { color: var(--muted); font-size: 12px; margin: 0; }
+    .heading-row { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin-bottom: 23px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 6px; padding: 10px 14px; cursor: pointer; font-weight: 700; font-size: 11px; transition: transform .15s, background .15s; }
+    .button:hover { transform: translateY(-1px); }
+    .button-primary { color: white; background: var(--green); }
+    .button-primary:hover { background: var(--green-dark); }
+    .button-light { background: white; border: 1px solid var(--line); }
+    .button-light:hover { background: #f7f8f5; }
+    .button-lime { background: var(--lime); color: #233121; }
+    .icon { font-size: 15px; line-height: 1; }
+    .hero { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0,1fr) 245px; gap: 15px; background: var(--green); color: white; border-radius: 9px; min-height: 204px; padding: 26px 30px; margin-bottom: 20px; }
+    .hero:after { content: ""; position: absolute; right: 200px; top: -90px; width: 290px; height: 290px; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; box-shadow: 0 0 0 28px rgba(255,255,255,.035), 0 0 0 58px rgba(255,255,255,.025); pointer-events: none; }
+    .hero-copy { z-index: 1; align-self: center; }
+    .hero .eyebrow { color: #b6e4c8; }
+    .hero h2 { font-size: 24px; line-height: 1.3; margin: 9px 0 7px; max-width: 470px; }
+    .hero p { color: #d0e5d9; font-size: 11px; margin: 0 0 17px; }
+    .hero-art { z-index: 1; align-self: center; justify-self: end; width: 216px; height: 145px; border-radius: 7px; object-fit: cover; }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 27px; }
+    .metric { display: flex; align-items: center; gap: 12px; background: white; border: 1px solid var(--line); padding: 14px 16px; border-radius: 8px; }
+    .metric-icon { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; font-size: 16px; flex: 0 0 auto; }
+    .metric-icon.mint { background: var(--mint); }.metric-icon.yellow { background: var(--yellow); }.metric-icon.blue { background: var(--blue); }
+    .metric-value { font-weight: 700; font-size: 19px; line-height: 1.1; }
+    .metric-label { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .section-heading h2 { margin: 0; font-size: 15px; }
+    .section-heading .text-link { font-size: 10px; }
+    .course-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+    .course-card { background: white; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; transition: box-shadow .2s, transform .2s; }
+    .course-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    .course-image { height: 119px; width: 100%; object-fit: cover; display: block; }
+    .course-body { padding: 13px 14px 14px; }
+    .course-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 9px; }
+    .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 700; color: var(--green); background: #edf6f0; padding: 5px 7px; border-radius: 4px; }
+    .course-time { color: #9aa49f; font-size: 9px; }
+    .course-card h3 { font-size: 13px; line-height: 1.45; margin: 0 0 6px; }
+    .course-desc { color: var(--muted); font-size: 10px; line-height: 1.55; min-height: 32px; margin: 0 0 13px; }
+    .progress-row { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-bottom: 6px; }
+    .progress-track { height: 4px; border-radius: 8px; background: #edf0ec; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: inherit; background: var(--green); transition: width .35s; }
+    .course-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+    .tiny-avatars { display: flex; padding-left: 3px; }
+    .tiny-avatars span { width: 20px; height: 20px; margin-left: -3px; border: 2px solid white; border-radius: 50%; background: #e5ba9c; font-size: 7px; display: grid; place-items: center; }
+    .tiny-avatars span:nth-child(2) { background: #d8e4b8; }.tiny-avatars span:nth-child(3) { background: #c7d9e3; }
+    .continue-button { border: 0; cursor: pointer; background: none; color: var(--green); font-size: 10px; font-weight: 700; }
+    .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; margin-top: 27px; }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 17px; }
+    .panel-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 13px; }
+    .panel-title h2 { font-size: 13px; margin: 0; }
+    .activity-row { padding: 10px 0; border-top: 1px solid #f0f2ef; display: flex; align-items: center; gap: 11px; }
+    .activity-symbol { width: 32px; height: 32px; border-radius: 7px; background: #f7efcf; display: grid; place-items: center; font-size: 14px; flex: 0 0 auto; }
+    .activity-row:nth-child(3) .activity-symbol { background: #e5edf6; }.activity-row:nth-child(4) .activity-symbol { background: #e6f2e8; }
+    .activity-info { flex: 1; min-width: 0; }.activity-info strong { display: block; font-size: 10px; }.activity-info small { color: var(--muted); font-size: 9px; }
+    .activity-status { color: var(--green); font-size: 9px; font-weight: 700; }
+    .streak-panel { background: #f7f3df; border-color: #eee7c9; }
+    .streak-panel h2 { font-size: 13px; margin: 0 0 5px; }.streak-panel p { color: #777762; font-size: 10px; line-height: 1.5; margin-bottom: 15px; }
+    .week { display: flex; justify-content: space-between; gap: 6px; }.day { text-align: center; color: #878777; font-size: 8px; }.day i { font-style: normal; width: 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; background: #fff; margin: 5px auto 0; color: #a2a294; }.day.done i { background: var(--green); color: white; }
+    .path-layout, .instructor-layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; align-items: start; gap: 18px; }
+    .form-panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 21px; }
+    .form-panel h2 { font-size: 15px; margin: 0 0 6px; }.form-intro { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 0 0 19px; }
+    .field { margin-bottom: 14px; }.field label { display: block; font-size: 10px; font-weight: 700; margin-bottom: 6px; }.field input, .field select, .field textarea { width: 100%; padding: 10px 11px; border: 1px solid var(--line); border-radius: 5px; background: white; color: var(--ink); font-size: 11px; outline: none; }.field textarea { resize: vertical; min-height: 81px; line-height: 1.5; }.field input:focus, .field select:focus, .field textarea:focus { border-color: #80b49c; box-shadow: 0 0 0 3px #e9f5ed; }
+    .topic-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: -3px 0 16px; }.topic-chip { border: 1px solid var(--line); background: #fff; border-radius: 20px; padding: 6px 9px; font-size: 9px; color: #66736d; cursor: pointer; }.topic-chip:hover { border-color: var(--green); color: var(--green); }
+    .path-result { margin-top: 16px; display: none; }.path-result.show { display: block; animation: appear .2s ease both; }.path-steps { display: grid; gap: 0; margin-top: 14px; }.path-step { display: grid; grid-template-columns: 24px 1fr; gap: 9px; padding: 10px 0; border-top: 1px solid var(--line); }.step-number { width: 21px; height: 21px; background: var(--mint); color: var(--green); border-radius: 50%; display: grid; place-items: center; font-size: 9px; font-weight: 700; }.path-step strong { font-size: 10px; display: block; margin: 1px 0 3px; }.path-step small { font-size: 9px; color: var(--muted); line-height: 1.5; }
+    .side-note { background: #eaf3ec; border-radius: 8px; padding: 17px; }.side-note .note-icon { font-size: 20px; margin-bottom: 11px; }.side-note h3 { font-size: 12px; margin: 0 0 6px; }.side-note p { color: #607369; font-size: 10px; line-height: 1.6; margin: 0; }
+    .class-banner { background: #eff4e1; border: 1px solid #e4ebd2; border-radius: 8px; padding: 15px 17px; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 17px; }.class-banner strong { font-size: 12px; }.class-banner p { font-size: 10px; color: var(--muted); margin: 4px 0 0; }
+    .table-wrap { overflow-x: auto; }.student-table { border-collapse: collapse; width: 100%; min-width: 520px; }.student-table th { text-align: left; color: #8c9791; font-size: 9px; font-weight: 600; padding: 10px 9px; border-bottom: 1px solid var(--line); }.student-table td { padding: 11px 9px; border-bottom: 1px solid #f0f2ef; font-size: 10px; white-space: nowrap; }.student-name { display: flex; align-items: center; gap: 8px; font-weight: 600; }.student-avatar { height: 25px; width: 25px; border-radius: 50%; background: #e8c9ae; display: grid; place-items: center; font-size: 8px; }.student-avatar.alt { background: #d6e4d2; }.student-avatar.blue { background: #d7e3ec; }.student-avatar.pink { background: #ead9e3; }.status-pill { border-radius: 15px; padding: 4px 7px; font-size: 8px; font-weight: 700; color: #367050; background: #e6f3e9; }.status-pill.idle { color: #9a6c2f; background: #f8efd8; }
+    .builder-preview { margin-top: 16px; padding: 14px; background: #f6f8f5; border: 1px dashed #ccd8ce; border-radius: 7px; display: none; }.builder-preview.show { display: block; animation: appear .2s ease both; }.builder-preview strong { font-size: 11px; }.builder-preview p { font-size: 10px; color: var(--muted); margin: 5px 0 10px; line-height: 1.5; }.builder-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 15px); opacity: 0; pointer-events: none; background: #183c31; color: white; padding: 11px 16px; border-radius: 6px; font-size: 11px; box-shadow: var(--shadow); transition: .22s; z-index: 10; }.toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(16,34,28,.42); z-index: 20; padding: 20px; align-items: center; justify-content: center; }.modal-backdrop.open { display: flex; animation: appear .18s ease both; }.modal { position: relative; width: min(520px, 100%); max-height: 90vh; overflow-y: auto; background: white; border-radius: 9px; padding: 25px; box-shadow: 0 20px 70px rgba(0,0,0,.16); }.modal-close { position: absolute; right: 15px; top: 14px; border: 1px solid var(--line); background: white; border-radius: 5px; width: 29px; height: 29px; cursor: pointer; }.modal h2 { font-size: 19px; margin: 8px 30px 7px 0; }.modal p { color: var(--muted); font-size: 11px; line-height: 1.6; }.scenario { background: #f3f7f3; padding: 14px; border-radius: 7px; border-left: 3px solid var(--green); font-size: 11px; line-height: 1.6; margin: 17px 0; }.answer-list { display: grid; gap: 8px; }.answer-option { padding: 11px 12px; border: 1px solid var(--line); background: white; border-radius: 6px; text-align: left; cursor: pointer; font-size: 10px; line-height: 1.5; }.answer-option:hover, .answer-option.selected { border-color: var(--green); background: #f0f7f1; }.answer-feedback { font-size: 10px; font-weight: 600; margin-top: 11px; min-height: 15px; }.modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 19px; }
+    @media (max-width: 900px) { .app { grid-template-columns: 205px minmax(0,1fr); }.hero { grid-template-columns: minmax(0,1fr) 190px; }.hero-art { width: 180px; }.course-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.course-card:last-child { display: none; } }
+    @media (max-width: 680px) { .app { display: block; }.sidebar { min-height: 0; height: auto; padding: 13px 15px 8px; border-right: 0; border-bottom: 1px solid var(--line); }.brand { padding: 0 3px 11px; font-size: 16px; }.brand-mark { width: 28px; height: 28px; }.workspace-label, .side-bottom { display: none; }.nav { display: flex; overflow-x: auto; gap: 3px; padding-bottom: 2px; }.nav button { flex: 0 0 auto; padding: 8px 9px; font-size: 10px; gap: 6px; }.nav-icon { font-size: 13px; }.topbar { height: 52px; padding: 0 17px; }.top-actions { gap: 8px; }.content { padding: 23px 16px 39px; }.heading-row { align-items: start; flex-direction: column; gap: 13px; }.heading-row > .button { align-self: stretch; }.hero { grid-template-columns: minmax(0,1fr) 105px; min-height: 175px; padding: 20px 17px; gap: 5px; }.hero h2 { font-size: 19px; }.hero p { font-size: 10px; }.hero-art { width: 100px; height: 110px; }.hero:after { right: 30px; }.metric-grid { gap: 7px; }.metric { align-items: flex-start; padding: 10px 8px; gap: 7px; flex-direction: column; }.metric-icon { width: 27px; height: 27px; font-size: 13px; }.metric-value { font-size: 16px; }.metric-label { font-size: 8px; }.course-grid { grid-template-columns: 1fr; }.course-card:last-child { display: block; }.course-image { height: 145px; }.lower-grid, .path-layout, .instructor-layout { grid-template-columns: 1fr; }.streak-panel { order: -1; }.class-banner { align-items: flex-start; flex-direction: column; }.role-switch button { padding: 5px 7px; font-size: 9px; }.breadcrumbs { font-size: 10px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">↗</span> loop<span style="color:var(--green)">learn</span></div>
+      <div class="workspace-label">學習空間</div>
+      <nav class="nav" aria-label="主導覽">
+        <button class="active" data-view="home"><span class="nav-icon">⌂</span>學習總覽</button>
+        <button data-view="courses"><span class="nav-icon">▤</span>探索課程</button>
+        <button data-view="path"><span class="nav-icon">⌁</span>我的學習路徑</button>
+        <button data-view="instructor"><span class="nav-icon">▧</span>教師工作台</button>
+      </nav>
+      <div class="side-bottom">
+        <div class="coach-card">
+          <div class="coach-avatar">✦</div>
+          <strong>你的 AI 學習夥伴</strong>
+          <p>依照你的程度與目標，調整接下來的學習內容。</p>
+          <button class="text-link" data-go="path">規劃新路徑 <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="profile"><div class="avatar">林</div><div><div class="profile-name">林以安</div><div class="profile-role" id="profileRole">學習者 · 個人空間</div></div></div>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div class="breadcrumbs">工作空間 <span aria-hidden="true">/</span> <b id="breadcrumb">學習總覽</b></div>
+        <div class="top-actions">
+          <div class="role-switch" aria-label="切換使用者角色"><button class="active" data-role="learner">學習者</button><button data-role="instructor">教師</button></div>
+          <button class="icon-button" aria-label="通知" title="通知">♧<span class="notification-dot"></span></button>
+        </div>
+      </header>
+      <div class="content">
+        <section class="view active" id="view-home">
+          <div class="heading-row"><div><div class="eyebrow">星期二 · 你的學習日</div><h1>早安，以安。</h1><p class="subheading">今天，讓一個小小的練習帶你更靠近目標。</p></div><button class="button button-primary" data-go="courses"><span class="icon">＋</span>探索課程</button></div>
+          <div class="hero">
+            <div class="hero-copy"><div class="eyebrow">案件 001 · 15 分鐘</div><h2>登入按鈕的<br>兩種真相</h2><p>找出合併衝突背後的兩種需求，像真正的工程師一樣蒐證、驗證、修復。</p><a class="button button-lime" href="detective.html"><span class="icon">⌕</span>開始找錯偵探</a></div>
+            <img class="hero-art" src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=85" alt="團隊在桌上討論與規劃工作">
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><div class="metric-icon mint">◷</div><div><div class="metric-value">4.5 小時</div><div class="metric-label">本週學習時間</div></div></div>
+            <div class="metric"><div class="metric-icon yellow">✦</div><div><div class="metric-value">6 天</div><div class="metric-label">連續學習紀錄</div></div></div>
+            <div class="metric"><div class="metric-icon blue">✓</div><div><div class="metric-value" id="completedCount">8 / 12</div><div class="metric-label">已完成的活動</div></div></div>
+          </div>
+          <div class="section-heading"><h2>繼續你的學習</h2><button class="text-link" data-go="courses">所有課程 →</button></div>
+          <div class="course-grid" id="courseGrid">
+            <article class="course-card"><img class="course-image" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80" alt="筆電與數位學習畫面"><div class="course-body"><div class="course-meta"><span class="tag">產品思維</span><span class="course-time">◷ 2.5 小時</span></div><h3>從使用者問題到產品方案</h3><p class="course-desc">用同理心地圖和快速原型，練習把真實需求轉成可驗證的想法。</p><div class="progress-row"><span>學習進度</span><span>65%</span></div><div class="progress-track"><div class="progress-fill" style="width:65%"></div></div><div class="course-footer"><div class="tiny-avatars"><span>J</span><span>M</span><span>A</span></div><button class="continue-button" data-activity="product">繼續學習 →</button></div></div></article>
+            <article class="course-card"><img class="course-image" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=700&q=80" alt="電路板與工程零件"><div class="course-body"><div class="course-meta"><span class="tag" style="background:#eef1fa;color:#4b5f9b">AI 協作</span><span class="course-time">◷ 1.5 小時</span></div><h3>和 AI Coding Agent 一起寫程式</h3><p class="course-desc">練習拆解任務、提供上下文，並審查 AI 產生的程式碼。</p><div class="progress-row"><span>學習進度</span><span>30%</span></div><div class="progress-track"><div class="progress-fill" style="width:30%;background:#6587b9"></div></div><div class="course-footer"><div class="tiny-avatars"><span>R</span><span>K</span><span>T</span></div><button class="continue-button" data-activity="agents">繼續學習 →</button></div></div></article>
+            <article class="course-card"><img class="course-image" src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=700&q=80" alt="團隊成員在白板前協作"><div class="course-body"><div class="course-meta"><span class="tag" style="background:#fff1e9;color:#b56743">軟實力</span><span class="course-time">◷ 1 小時</span></div><h3>讓程式碼審查更有建設性</h3><p class="course-desc">用具體、友善的回饋，一起提升團隊交付品質。</p><div class="progress-row"><span>學習進度</span><span>0%</span></div><div class="progress-track"><div class="progress-fill" style="width:0%;background:var(--coral)"></div></div><div class="course-footer"><div class="tiny-avatars"><span>C</span><span>W</span><span>L</span></div><button class="continue-button" data-activity="review">開始學習 →</button></div></div></article>
+          </div>
+          <div class="lower-grid">
+            <div class="panel"><div class="panel-title"><h2>最近的學習活動</h2><button class="text-link" data-go="courses">查看全部</button></div><div class="activity-row"><div class="activity-symbol">◇</div><div class="activity-info"><strong>拆解一個好問題</strong><small>軟體工程入門 · 昨天</small></div><span class="activity-status">已完成 ✓</span></div><div class="activity-row"><div class="activity-symbol">⌘</div><div class="activity-info"><strong>AI 提示詞實驗室</strong><small>AI 協作 · 週一</small></div><span class="activity-status">已完成 ✓</span></div><div class="activity-row"><div class="activity-symbol">▱</div><div class="activity-info"><strong>你的第一張使用者旅程地圖</strong><small>產品思維 · 週日</small></div><span class="activity-status">已完成 ✓</span></div></div>
+            <div class="panel streak-panel"><h2>你的學習節奏</h2><p>穩定的小步前進，也是一種很棒的進度。</p><div class="week"><div class="day done">一<i>✓</i></div><div class="day done">二<i>✓</i></div><div class="day done">三<i>✓</i></div><div class="day done">四<i>✓</i></div><div class="day done">五<i>✓</i></div><div class="day done">六<i>✓</i></div><div class="day">日<i>·</i></div></div></div>
+          </div>
+        </section>
+        <section class="view" id="view-courses">
+          <div class="heading-row"><div><div class="eyebrow">探索與練習</div><h1>找到下一個好問題。</h1><p class="subheading">從軟體工程基礎，到 AI 時代的協作方式。</p></div><button class="button button-light" data-go="path"><span class="icon">✦</span>打造個人路徑</button></div>
+          <div class="course-grid" id="catalogGrid"></div>
+          <div class="lower-grid"><div class="panel"><div class="panel-title"><h2>想學的內容不在這裡？</h2></div><p class="form-intro" style="margin-bottom:12px">輸入你想探索的主題，AI 學習夥伴會替你排出一條合適的起點。</p><button class="button button-primary" data-go="path">建立我的學習路徑 <span>→</span></button></div><div class="side-note"><div class="note-icon">✦</div><h3>不必先懂程式，也能開始</h3><p>每門課都會依你的背景調整說明方式。用熟悉的生活情境，慢慢建立軟體開發的直覺。</p></div></div>
+        </section>
+        <section class="view" id="view-path">
+          <div class="heading-row"><div><div class="eyebrow">個人化學習</div><h1>從你的好奇心出發。</h1><p class="subheading">告訴 AI 你想學什麼，它會幫你整理出能一步步走的路徑。</p></div></div>
+          <div class="path-layout"><div class="form-panel"><h2>規劃一條新的學習路徑</h2><p class="form-intro">先設定主題與你的背景，接著就能拿到一份個人化起點。</p><form id="pathForm"><div class="field"><label for="pathTopic">你想探索什麼？</label><input id="pathTopic" required placeholder="例如：用 AI 做出第一個網站" maxlength="90"></div><div class="topic-chips"><button class="topic-chip" type="button">用 Python 整理生活資料</button><button class="topic-chip" type="button">產品設計入門</button><button class="topic-chip" type="button">AI 工具與工作流程</button><button class="topic-chip" type="button">成為更好的團隊夥伴</button></div><div class="field"><label for="pathLevel">你目前的經驗</label><select id="pathLevel"><option>沒有相關經驗，想從基礎開始</option><option>有一些經驗，想建立完整概念</option><option>已有基礎，想實際做出作品</option></select></div><div class="field"><label for="pathGoal">學完後，你想做到什麼？</label><textarea id="pathGoal" placeholder="例如：做出一個介紹我興趣的小網站，並理解它怎麼運作。"></textarea></div><button class="button button-primary" type="submit"><span>✦</span>生成我的學習路徑</button></form><div class="path-result" id="pathResult"></div></div><aside class="side-note"><div class="note-icon">⌁</div><h3>從你的目標開始，而不是從標準答案開始</h3><p>你可以用生活中的語言描述目標。路徑會先建立必要概念，再透過短活動讓新知連到你熟悉的世界。<br><br>內容包含互動練習、情境模擬與 AI 回饋，適合不同背景的學習者。</p></aside></div>
+        </section>
+        <section class="view" id="view-instructor">
+          <div class="heading-row"><div><div class="eyebrow">課程設計與班級參與</div><h1>教學，從一個好活動開始。</h1><p class="subheading">設計迷你課程、匯入學生，掌握每個人的參與狀況。</p></div><button class="button button-primary" id="focusBuilder"><span class="icon">＋</span>建立新課程</button></div>
+          <div class="class-banner"><div><strong>COMP5241 · 軟體工程與 AI 協作</strong><p>春季學期 · 24 位學生 · 最近更新 2 小時前</p></div><button class="button button-light" id="importStudents">↑ 匯入學生</button></div>
+          <div class="instructor-layout"><div><div class="panel"><div class="panel-title"><h2>學生參與概況</h2><span class="tag">本週</span></div><div class="metric-grid" style="margin:0 0 12px"><div class="metric"><div class="metric-icon mint">◉</div><div><div class="metric-value">19 / 24</div><div class="metric-label">本週有參與</div></div></div><div class="metric"><div class="metric-icon yellow">▣</div><div><div class="metric-value">78%</div><div class="metric-label">活動完成率</div></div></div><div class="metric"><div class="metric-icon blue">◷</div><div><div class="metric-value">2.3 小時</div><div class="metric-label">平均學習時間</div></div></div></div><div class="table-wrap"><table class="student-table"><thead><tr><th>學生</th><th>最近活動</th><th>完成率</th><th>參與狀態</th></tr></thead><tbody><tr><td><div class="student-name"><span class="student-avatar">陳</span>陳語彤</div></td><td>需求訪談模擬 · 2 小時前</td><td>92%</td><td><span class="status-pill">積極參與</span></td></tr><tr><td><div class="student-name"><span class="student-avatar alt">黃</span>黃冠宇</div></td><td>AI 程式碼審查 · 今天</td><td>75%</td><td><span class="status-pill">積極參與</span></td></tr><tr><td><div class="student-name"><span class="student-avatar blue">李</span>李欣怡</div></td><td>使用者故事練習 · 昨天</td><td>58%</td><td><span class="status-pill idle">需要關注</span></td></tr><tr><td><div class="student-name"><span class="student-avatar pink">張</span>張柏翰</div></td><td>尚未開始本週活動</td><td>12%</td><td><span class="status-pill idle">需要關注</span></td></tr></tbody></table></div><div style="padding-top:12px;text-align:right"><button class="text-link" id="exportStudents">匯出參與報告 ↓</button></div></div></div>
+            <div class="form-panel" id="courseBuilder"><div class="eyebrow">AI 課程設計夥伴</div><h2 style="margin-top:7px">建立迷你課程</h2><p class="form-intro">給 AI 一個主題與教學目標，從可編輯的課程草稿開始。</p><form id="builderForm"><div class="field"><label for="courseTopic">課程主題</label><input id="courseTopic" required placeholder="例如：Git 協作與版本管理" maxlength="90"></div><div class="field"><label for="courseAudience">適合的學習者</label><select id="courseAudience"><option>跨領域初學者</option><option>資訊相關科系學生</option><option>準備求職的工程師</option><option>依程度自動調整</option></select></div><div class="field"><label for="courseObjectives">教學目標或素材</label><textarea id="courseObjectives" placeholder="例如：讓學生理解分支、合併與衝突處理。安排一個兩人協作模擬。"></textarea></div><button class="button button-primary" type="submit"><span>✦</span>生成課程草稿</button></form><div class="builder-preview" id="builderPreview"></div></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal-backdrop" id="activityModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal"><button class="modal-close" aria-label="關閉">×</button><div class="eyebrow" id="modalEyebrow">互動情境</div><h2 id="modalTitle">需求訪談模擬</h2><p id="modalIntro">練習將模糊的需求轉化為可理解、可驗證的問題。</p><div class="scenario" id="scenarioText"></div><div class="answer-list" id="answerList"></div><div class="answer-feedback" id="answerFeedback" aria-live="polite"></div><div class="modal-footer"><span style="font-size:9px;color:var(--muted)">情境練習 · AI 學習夥伴回饋</span><button class="button button-primary" id="submitAnswer">送出回答</button></div></div></div>
+  <script>
+    const views = [...document.querySelectorAll('.view')];
+    const navButtons = [...document.querySelectorAll('.nav button[data-view]')];
+    const breadcrumb = document.getElementById('breadcrumb');
+    const viewNames = { home: '學習總覽', courses: '探索課程', path: '我的學習路徑', instructor: '教師工作台' };
+    let currentActivity = null;
+    let selectedAnswer = -1;
+    let generatedCourses = 0;
+
+    function showView(name) {
+      views.forEach(view => view.classList.toggle('active', view.id === `view-${name}`));
+      navButtons.forEach(button => button.classList.toggle('active', button.dataset.view === name));
+      breadcrumb.textContent = viewNames[name];
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    navButtons.forEach(button => button.addEventListener('click', () => showView(button.dataset.view)));
+    document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => showView(button.dataset.go)));
+    document.querySelectorAll('[data-role]').forEach(button => button.addEventListener('click', () => {
+      const instructor = button.dataset.role === 'instructor';
+      document.querySelectorAll('[data-role]').forEach(item => item.classList.toggle('active', item === button));
+      document.getElementById('profileRole').textContent = instructor ? '教師 · COMP5241 課程' : '學習者 · 個人空間';
+      if (instructor) showView('instructor');
+      else if (document.getElementById('view-instructor').classList.contains('active')) showView('home');
+    }));
+
+    const activityData = {
+      requirements: { title: '把需求問清楚', intro: '你的團隊正在為校園活動設計報名頁面，試著先理解真正的需求。', scenario: '主辦人說：「做一個頁面，讓大家可以報名活動。越快上線越好。」你會先問哪一個問題？', answers: ['「你想要什麼顏色的按鈕？」先把視覺定下來。', '「報名者是誰？他們完成報名時，需要知道或收到什麼？」', '「我先做一個表單，細節之後再說。」'], correct: 1, feedback: '很好的起點！先了解使用者與成功條件，才能避免把時間花在解錯的問題上。' },
+      product: { title: '從痛點找到機會', intro: '用使用者視角理解問題，再決定值得驗證的產品假設。', scenario: '一位同學說：「我每次都忘記圖書館借的書什麼時候到期。」你想先確認這個問題值得解決，怎麼做？', answers: ['直接開始做一個功能豐富的閱讀 App。', '了解這種情況發生多常、目前怎麼處理，以及造成什麼影響。', '先在社群發文問大家喜歡哪種 App 顏色。'], correct: 1, feedback: '正是如此。了解問題的頻率、目前做法與影響，能幫助團隊設計更貼近需求的解法。' },
+      agents: { title: '和 AI Agent 合作', intro: 'AI 可以加速實作，清楚的任務邊界與驗收條件讓結果更可靠。', scenario: '你希望 Coding Agent 在待辦清單新增「依截止日排序」。怎樣的指令最有助於它正確完成？', answers: ['「幫我把待辦清單變得更好用，謝謝！」', '「替清單新增截止日升冪排序按鈕；保留目前篩選，沒有截止日的項目排最後，補上測試。」', '「重寫整個待辦 App，順便調整你覺得不好的地方。」'], correct: 1, feedback: '清楚描述範圍、預期行為和驗收方式，既能引導 Agent，也方便你審查結果。' },
+      review: { title: '讓回饋促進合作', intro: '好的程式碼審查聚焦在問題與影響，也保留討論的空間。', scenario: '你發現同事的變更漏掉了輸入為空時的處理。哪種留言最能幫助對方修正？', answers: ['「這裡寫得很糟，重寫一下。」', '「這個欄位可能收到空字串，會讓提交失敗。可以加上空值檢查，並補一個對應測試嗎？」', '不留言，直接改完後合併。'], correct: 1, feedback: '具體指出情境、影響與可行的下一步，讓討論保持尊重，也更容易改善品質。' }
+    };
+    function openActivity(key) {
+      const activity = activityData[key] || activityData.requirements;
+      currentActivity = activity;
+      selectedAnswer = -1;
+      document.getElementById('modalTitle').textContent = activity.title;
+      document.getElementById('modalIntro').textContent = activity.intro;
+      document.getElementById('scenarioText').textContent = activity.scenario;
+      document.getElementById('answerFeedback').textContent = '';
+      document.getElementById('answerList').innerHTML = activity.answers.map((answer, index) => `<button class="answer-option" data-answer="${index}">${answer}</button>`).join('');
+      document.querySelectorAll('.answer-option').forEach(option => option.addEventListener('click', () => {
+        selectedAnswer = Number(option.dataset.answer);
+        document.querySelectorAll('.answer-option').forEach(item => item.classList.toggle('selected', item === option));
+        document.getElementById('answerFeedback').textContent = '';
+      }));
+      document.getElementById('activityModal').classList.add('open');
+    }
+    document.querySelectorAll('[data-activity]').forEach(button => button.addEventListener('click', () => openActivity(button.dataset.activity)));
+    const modal = document.getElementById('activityModal');
+    function closeModal() { modal.classList.remove('open'); }
+    document.querySelector('.modal-close').addEventListener('click', closeModal);
+    modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') closeModal(); });
+    document.getElementById('submitAnswer').addEventListener('click', () => {
+      const feedback = document.getElementById('answerFeedback');
+      if (selectedAnswer < 0) { feedback.textContent = '選擇一個回答，再看看 AI 學習夥伴的回饋。'; feedback.style.color = '#a36e2a'; return; }
+      const correct = selectedAnswer === currentActivity.correct;
+      feedback.textContent = correct ? currentActivity.feedback : '再想想看：先理解情境中的人與他們想完成的事，往往能找到更好的下一步。';
+      feedback.style.color = correct ? 'var(--green)' : '#a36e2a';
+      if (correct) { document.getElementById('completedCount').textContent = '9 / 12'; document.getElementById('submitAnswer').textContent = '完成練習'; document.getElementById('submitAnswer').onclick = closeModal; }
+    });
+
+    document.querySelectorAll('.topic-chip').forEach(chip => chip.addEventListener('click', () => { document.getElementById('pathTopic').value = chip.textContent; }));
+    document.getElementById('pathForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const topic = document.getElementById('pathTopic').value.trim();
+      if (!topic) return;
+      const level = document.getElementById('pathLevel').value;
+      const result = document.getElementById('pathResult');
+      result.innerHTML = `<div class="eyebrow">✦ 已為你整理學習起點</div><h2 style="font-size:15px;margin:7px 0 4px">${escapeHtml(topic)}<\/h2><p class="subheading">${escapeHtml(level)} · 約 2 小時</p><div class="path-steps"><div class="path-step"><span class="step-number">1</span><div><strong>先建立核心概念</strong><small>用日常案例認識「${escapeHtml(topic)}」的關鍵名詞與基本原理。</small></div></div><div class="path-step"><span class="step-number">2</span><div><strong>在情境中做一次選擇</strong><small>透過互動模擬處理一個真實情境，AI 會依你的回答提供提示。</small></div></div><div class="path-step"><span class="step-number">3</span><div><strong>做出一個小作品</strong><small>把所學應用在一個可完成、可分享的迷你專案。</small></div></div></div><button class="button button-primary" id="startPath">從第一步開始 <span>→</span></button>`;
+      result.classList.add('show');
+      document.getElementById('startPath').addEventListener('click', () => openActivity('requirements'));
+    });
+
+    document.getElementById('builderForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const topic = document.getElementById('courseTopic').value.trim();
+      if (!topic) return;
+      const audience = document.getElementById('courseAudience').value;
+      const objectives = document.getElementById('courseObjectives').value.trim();
+      const preview = document.getElementById('builderPreview');
+      preview.innerHTML = `<div class="eyebrow">✦ 課程草稿 · 可繼續編輯</div><strong>${escapeHtml(topic)}</strong><p>依「${escapeHtml(audience)}」設計 · 3 個單元 · 25 分鐘<br>${objectives ? `教學方向：${escapeHtml(objectives)}` : '包含概念導讀、情境模擬與反思練習。'}</p><div class="builder-meta"><span class="tag">互動情境</span><span class="tag" style="background:#eef1fa;color:#4b5f9b">AI 回饋</span><span class="tag" style="background:#fff1e9;color:#b56743">學習檢核</span></div><button class="button button-primary" id="addCourse" style="margin-top:12px">加入課程庫</button>`;
+      preview.classList.add('show');
+      document.getElementById('addCourse').addEventListener('click', () => {
+        generatedCourses++;
+        const card = document.createElement('article');
+        card.className = 'course-card';
+        card.innerHTML = `<div style="height:119px;background:linear-gradient(135deg,#e6f1e8,#d4e6db);display:grid;place-items:center;font-size:36px;color:var(--green)">✦</div><div class="course-body"><div class="course-meta"><span class="tag">新課程</span><span class="course-time">◷ 25 分鐘</span></div><h3>${escapeHtml(topic)}</h3><p class="course-desc">為${escapeHtml(audience)}設計的迷你課程，包含互動情境與 AI 回饋。</p><div class="course-footer"><span class="course-time">課程草稿 · 剛剛建立</span><button class="continue-button" data-activity="requirements">預覽課程 →</button></div></div>`;
+        document.getElementById('catalogGrid').prepend(card);
+        card.querySelector('[data-activity]').addEventListener('click', () => openActivity('requirements'));
+        showToast('課程已加入課程庫');
+      });
+    });
+    document.getElementById('focusBuilder').addEventListener('click', () => { document.getElementById('courseTopic').focus(); document.getElementById('courseBuilder').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    document.getElementById('importStudents').addEventListener('click', () => showToast('示範模式：可匯入 CSV 學生名單'));
+    document.getElementById('exportStudents').addEventListener('click', () => showToast('示範模式：參與報告已準備匯出'));
+    function escapeHtml(value) { return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]); }
+    let toastTimer;
+    function showToast(message) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 2500); }
+
+    const catalog = [
+      ['軟體工程', '軟體開發到底在做什麼？', '從需求、設計、實作到測試，快速理解軟體團隊如何把想法變成產品。', '⌘', 'requirements'],
+      ['AI 協作', '和 AI Coding Agent 一起寫程式', '練習拆解任務、提供上下文，並審查 AI 產生的程式碼。', '✦', 'agents'],
+      ['產品思維', '從使用者問題到產品方案', '用同理心地圖和快速原型，練習把真實需求轉成可驗證的想法。', '◇', 'product'],
+      ['軟實力', '讓程式碼審查更有建設性', '用具體、友善的回饋，一起提升團隊交付品質。', '↗', 'review'],
+      ['軟體工程', 'Git 協作與版本管理', '透過小組情境模擬，練習分支、合併與解決衝突。', '⌥', 'agents'],
+      ['職涯準備', '工程師面試情境練習', '以互動角色扮演練習表達思路、拆解問題並回應追問。', '◎', 'product']
+    ];
+    const catalogGrid = document.getElementById('catalogGrid');
+    catalog.forEach(([tag, title, description, symbol, activity]) => {
+      const card = document.createElement('article');
+      card.className = 'course-card';
+      card.innerHTML = `<div style="height:119px;background:linear-gradient(135deg,#e4efe6,#dce7ed);display:grid;place-items:center;font-size:32px;color:var(--green)">${symbol}</div><div class="course-body"><div class="course-meta"><span class="tag">${tag}</span><span class="course-time">◷ 20 分鐘</span></div><h3>${title}</h3><p class="course-desc">${description}</p><div class="course-footer"><span class="course-time">互動迷你課程</span><button class="continue-button" data-activity="${activity}">查看課程 →</button></div></div>`;
+      catalogGrid.appendChild(card);
+      card.querySelector('[data-activity]').addEventListener('click', () => openActivity(activity));
+    });
+  </script>
+</body>
+</html>
